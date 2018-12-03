@@ -1,10 +1,23 @@
-const http = require('http');
 const appPort = 8080;
 
-http.createServer((request, response) => {
-    response.writeHead(200, { 'Content-Type': 'application/json' });
-    response.end(JSON.stringify({'greeting': 'Hello World!' }));
-})
-.listen(appPort);
+const express = require('express');
+const bodyParser = require('body-parser');
+const cors = require('cors');
 
-console.log(`Listening on port ${appPort}`);
+// express app setup
+const appHandlers = [
+    cors(), 
+    bodyParser.json()
+];
+
+const app = express();
+app.use(appHandlers);
+app.listen(appPort, () => {
+    console.log(`Listening on port ${appPort}`);
+});
+
+app.get('/', (request, response) => {
+    response
+        .status(200)
+        .send(JSON.stringify({'greeting': 'Hello World!' }));
+});

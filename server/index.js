@@ -4,25 +4,18 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 
-// mongoDB setup
-const MongoClient = require('mongodb').MongoClient;
-const assert = require('assert');
-const dbUrl = 'mongodb://localhost:27017';
-const dbName = 'todo-app';
+// mongoose setup
+const mongoose = require('mongoose');
+const dbUrl = 'mongodb://localhost:27017/todo-app';
+// Get Mongoose to use the global promise library
+mongoose.Promise = global.Promise;
+const dbConnection = mongoose.connection;
 
-const client = new MongoClient(dbUrl);
+dbConnection.on('error', console.error.bind(console, 'MongoDB connection error:'));
 
-client.connect((error) => {
-    assert.equal(null, error);
-    console.log("Connected successfully to database server");
-
-    const db = client.db(dbName);
-
-    insertDocuments(db, () => {
-        client.close();
-    });
+mongoose.connect(dbUrl).then(() => {
+    console.log("Connected successfully to database server");    
 });
-
 
 // express app setup
 const appHandlers = [
@@ -42,17 +35,18 @@ app.get('/', (request, response) => {
         .send(JSON.stringify({ 'greeting': 'Hello World!' }));
 });
 
-const insertDocuments = function (db, callback) {
-    // Get the documents collection
-    const collection = db.collection('documents');
-    // Insert some documents
-    collection.insertMany([
-        { a: 1 }, { a: 2 }, { a: 3 }
-    ], function (err, result) {
-        assert.equal(err, null);
-        assert.equal(3, result.result.n);
-        assert.equal(3, result.ops.length);
-        console.log("Inserted 3 documents into the collection");
-        callback(result);
+const TodoTask = require('./models/TodoTask');
+
+app.post('/api/add-task', (request, response) => {
+
+    console.log(request.body);
+
+    TodoTask.create(request.body, (error, newTask) => {
+        if (error) {
+            console.log('Todotask saving error: ' + error);
+        }
+        response
+            .status(201)
+            .send(newTask);
     });
-}
+});

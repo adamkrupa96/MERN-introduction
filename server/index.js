@@ -38,9 +38,6 @@ app.get('/', (request, response) => {
 const TodoTask = require('./models/TodoTask');
 
 app.post('/api/add-task', (request, response) => {
-
-    console.log(request.body);
-
     TodoTask.create(request.body, (error, newTask) => {
         if (error) {
             console.log('Todotask saving error: ' + error);

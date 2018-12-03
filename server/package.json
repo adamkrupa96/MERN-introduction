@@ -1,8 +1,9 @@
 {
     "dependencies": {
-        "express": "4.16.4",
+        "body-parser": "*",
         "cors": "2.8.4",
-        "body-parser": "*"
+        "express": "4.16.4",
+        "mongodb": "^3.1.10"
     },
     "scripts": {
         "start": "node index.js"
